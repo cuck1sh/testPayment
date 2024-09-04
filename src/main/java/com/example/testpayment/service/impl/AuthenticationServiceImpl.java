@@ -33,6 +33,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .balance(START_CASH)
                 .failedLoginAttempts(0)
+                .role("DEFAULT")
+                .enabled(true)
                 .build();
 
         userService.create(user);
