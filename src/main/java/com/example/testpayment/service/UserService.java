@@ -13,4 +13,12 @@ public interface UserService {
     UserDetailsService userDetailsService();
 
     User getCurrentUser();
+
+    Boolean isBlocked(String email);
+
+    void loginFailed(String email);
+
+    void loginSuccess(String email);
+
+    void logout();
 }

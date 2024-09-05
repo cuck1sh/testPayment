@@ -26,27 +26,36 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserService userService;
+//    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+//    private final RateLimitService rateLimitService;
+
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize ->
                         authorize
-//                                .requestMatchers(HttpMethod.POST, "/login").permitAll()
-//                                .requestMatchers(HttpMethod.POST,"/register").permitAll()
-//                                .requestMatchers("/logout").permitAll()
                                 .requestMatchers("/payment").fullyAuthenticated()
+                                .requestMatchers("/logout").fullyAuthenticated()
                                 .anyRequest().permitAll()
                 )
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
-                );
+//                .addFilterBefore(rateLimitingAuthenticationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class))), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+//                .exceptionHandling(e -> e.authenticationEntryPoint(customAuthenticationEntryPoint));
+
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+            throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
@@ -62,9 +71,8 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
-        return config.getAuthenticationManager();
-    }
+//    @Bean
+//    public RateLimitingAuthenticationFilter rateLimitingAuthenticationFilter(AuthenticationManager authenticationManager) {
+//        return new RateLimitingAuthenticationFilter(authenticationManager, rateLimitService);
+//    }
 }

@@ -35,6 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .failedLoginAttempts(0)
                 .role("DEFAULT")
                 .enabled(true)
+                .logout(false)
                 .build();
 
         userService.create(user);
@@ -53,6 +54,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         UserDetails user = userService
                 .userDetailsService()
                 .loadUserByUsername(request.getEmail());
+
+        User dbUser = userService.getByEmail(user.getUsername());
+        dbUser.setLogout(false);
+        userService.save(dbUser);
 
         String jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);

@@ -3,11 +3,13 @@ package com.example.testpayment.service.impl;
 
 import com.example.testpayment.models.User;
 import com.example.testpayment.service.JwtService;
+import com.example.testpayment.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
     @Value("${token.signing.key}")
     private String jwtSigningKey;
+    private final UserService userService;
 
     @Override
     public String extractUserName(String token) {
@@ -42,7 +46,8 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public Boolean isTokenValid(String token, UserDetails userDetails) {
         final String userName = extractUserName(token);
-        return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        User user = userService.getByEmail(userDetails.getUsername());
+        return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token) && !user.getLogout();
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {

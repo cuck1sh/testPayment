@@ -40,6 +40,7 @@ public class User implements UserDetails {
     private String role;
 
     private Boolean enabled;
+    private Boolean logout;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
