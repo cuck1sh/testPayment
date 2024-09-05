@@ -38,14 +38,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if (!rateLimitService.tryConsume() && !rateLimitService.isAvailableTickets()) {
+
+        boolean loginRoute = "/login".equals(request.getRequestURI());
+        if (loginRoute && !rateLimitService.tryConsume() && !rateLimitService.isAvailableTickets()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            log.info("Должно выйти");
             response.getWriter().write("Too many attempts< try again later");
             return;
         }
-
-        log.info("Прошло");
 
         String authHeader = request.getHeader(HEADER_NAME);
         if (StringUtils.isEmpty(authHeader) || !StringUtils.startsWith(authHeader, BEARER_PREFIX)) {
@@ -70,7 +69,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         null,
                         userDetails.getAuthorities()
                 );
-
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 context.setAuthentication(authToken);
                 SecurityContextHolder.setContext(context);

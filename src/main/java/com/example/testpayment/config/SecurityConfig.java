@@ -26,10 +26,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserService userService;
-//    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-//    private final RateLimitService rateLimitService;
-
-
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -45,10 +41,7 @@ public class SecurityConfig {
                                 .anyRequest().permitAll()
                 )
                 .authenticationProvider(authenticationProvider())
-//                .addFilterBefore(rateLimitingAuthenticationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class))), UsernamePasswordAuthenticationFilter.class);
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-//                .exceptionHandling(e -> e.authenticationEntryPoint(customAuthenticationEntryPoint));
-
         return http.build();
     }
 
@@ -70,9 +63,4 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
-//    @Bean
-//    public RateLimitingAuthenticationFilter rateLimitingAuthenticationFilter(AuthenticationManager authenticationManager) {
-//        return new RateLimitingAuthenticationFilter(authenticationManager, rateLimitService);
-//    }
 }

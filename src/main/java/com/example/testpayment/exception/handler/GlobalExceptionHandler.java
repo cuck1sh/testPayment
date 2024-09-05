@@ -3,7 +3,6 @@ package com.example.testpayment.exception.handler;
 import com.example.testpayment.exception.AuthException;
 import com.example.testpayment.exception.ErrorResponseBody;
 import com.example.testpayment.service.ErrorService;
-import com.example.testpayment.service.RateLimitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,6 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
     private final ErrorService errorService;
-    private final RateLimitService rateLimitService;
 
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     public ResponseEntity<ErrorResponseBody> internalAuthenticationServiceException(InternalAuthenticationServiceException ex) {
