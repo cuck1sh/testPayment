@@ -10,39 +10,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
-    private static final int MAX_LOGIN_ATTEMPTS = 3;
-
-    @Override
-    public Boolean isBlocked(String email) {
-        User user = getByEmail(email);
-        return user.getLockUntil().isAfter(LocalDateTime.now()) && user.getLockUntil() != null;
-    }
-
-    @Override
-    public void loginFailed(String email) {
-        User user = getByEmail(email);
-        int currentAttempts = user.getFailedLoginAttempts();
-        user.setFailedLoginAttempts(currentAttempts + 1);
-        if (user.getFailedLoginAttempts() >= MAX_LOGIN_ATTEMPTS) {
-            user.setLockUntil(LocalDateTime.now().plusSeconds(30));
-            log.info("Пользователю {} превысил число попыток входа, доступ заблокирован на 30сек", user.getEmail());
-        }
-    }
-
-    @Override
-    public void loginSuccess(String email) {
-        User user = getByEmail(email);
-        user.setLockUntil(null);
-        user.setFailedLoginAttempts(0);
-        save(user);
-    }
 
     @Override
     public void logout() {
@@ -77,9 +49,4 @@ public class UserServiceImpl implements UserService {
         return this::getByEmail;
     }
 
-    @Override
-    public User getCurrentUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return getByEmail(username);
-    }
 }
